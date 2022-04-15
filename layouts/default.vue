@@ -1,7 +1,51 @@
 <template>
-  <div v-if="loaded" class="min-h-screen">
-    <Navbar />
-    <Nuxt />
+  <div v-if="loaded" class="min-h-screen bg-gray-50">
+    <div class="grid h-screen grid-cols-12">
+      <!-- sidebar -->
+      <div class="h-full col-span-2 text-black bg-white border-r">
+        <p class="px-4 py-5 text-lg font-bold leading-snug uppercase">
+          Dashboard
+        </p>
+
+        <!-- menu -->
+        <div class="mt-3 leading-snug text-black">
+          <nuxt-link
+            to="/"
+            exact-active-class="font-bold bg-gray-50"
+            class="flex flex-col text-sm"
+          >
+            <div class="px-4 py-3">Dashboard</div>
+          </nuxt-link>
+          <nuxt-link
+            to="/upload"
+            exact-active-class="font-bold bg-gray-50"
+            class="flex flex-col text-sm"
+          >
+            <div class="px-4 py-3">Upload Data File</div>
+          </nuxt-link>
+          <nuxt-link
+            to="/passengers"
+            exact-active-class="font-bold bg-gray-50"
+            class="flex flex-col text-sm"
+          >
+            <div class="px-4 py-3">Passengers</div>
+          </nuxt-link>
+        </div>
+      </div>
+      <div class="col-span-10 bg-gray-50">
+        <!-- navbar -->
+        <div class="px-4 py-5 bg-white">
+          <div class="flex justify-end">
+            <div class="">
+              <MaterialIcon class="text-sm" icon="power_settings_new" />
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <Nuxt />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -11,20 +55,19 @@ export default {
 
   data() {
     return {
-      loaded: false,
+      loaded: true,
     }
   },
 
   mounted() {
-    const user = JSON.parse(localStorage.getItem('user'))
-    if (user && user._id) {
-      this.$store.commit('setUser', {
-        loggedIn: true,
-        ...user,
-      })
-    }
-
-    this.loaded = true
+    this.$router.push('/upload')
   },
 }
 </script>
+
+<style lang="postcss" scoped>
+.body {
+  height: calc(100vh - 64px);
+  overflow: auto;
+}
+</style>

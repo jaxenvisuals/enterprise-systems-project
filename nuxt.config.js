@@ -43,6 +43,14 @@ export default {
         href: 'https://fonts.googleapis.com/icon?family=Material+Icons+Sharp',
       },
     ],
+    script: [
+      {
+        src: 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js',
+      },
+      {
+        src: 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js',
+      },
+    ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
