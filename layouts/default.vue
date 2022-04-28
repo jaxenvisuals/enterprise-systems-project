@@ -24,11 +24,16 @@
             <div class="px-4 py-3">Upload Data File</div>
           </nuxt-link>
           <nuxt-link
-            to="/passengers"
+            v-for="link in dataSets"
+            :key="link.value"
+            :to="link.url"
             exact-active-class="font-bold bg-gray-50"
             class="flex flex-col text-sm"
           >
-            <div class="px-4 py-3">Passengers</div>
+            <div class="flex justify-between px-4 py-3">
+              <span>{{ link.name }}</span>
+              <span>{{ dataLength(link) }}</span>
+            </div>
           </nuxt-link>
         </div>
       </div>
@@ -50,17 +55,41 @@
 </template>
 
 <script>
+import { dataSets } from '@/store/constants'
+
 export default {
   name: 'DefaultLayout',
 
   data() {
     return {
       loaded: true,
+      dataSets,
     }
   },
 
+  computed: {
+    stateDataSet() {
+      return this.$store.getters.dataSets
+    },
+
+    dataLength() {
+      return (link) => {
+        return this.stateDataSet[link.value]?.tableData?.body?.length || ''
+      }
+    },
+  },
+
   mounted() {
-    this.$router.push('/upload')
+    // this.$router.push('/upload')
+    this.getState()
+  },
+
+  methods: {
+    getState() {
+      const state = localStorage.getItem('state')
+      if (!state) return
+      this.$store.commit('setState', JSON.parse(state))
+    },
   },
 }
 </script>

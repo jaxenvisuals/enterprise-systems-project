@@ -1,5 +1,15 @@
 <template>
-  <tr class="px-2 pt-2 table-body">
+  <tr
+    class="px-2 pt-2 table-body relative"
+    :class="[
+      { 'cursor-pointer': options.clickable },
+      { 'bg-app-gray-150': selected },
+    ]"
+    @click="handleClick"
+  >
+    <td v-if="numbered" class="px-2 py-1 text-sm leading-snug text-left">
+      {{ index + 1 }}
+    </td>
     <td
       v-for="(body, i) in data.values"
       :key="i"
@@ -18,6 +28,35 @@ export default {
     data: {
       type: Object,
       required: true,
+    },
+
+    numbered: {
+      type: Boolean,
+      default: false,
+    },
+
+    index: {
+      type: Number,
+      default: null,
+    },
+
+    options: {
+      type: [Object, Boolean],
+      default: false,
+    },
+  },
+
+  computed: {
+    selected() {
+      return (
+        this.$store?.state?.analysis?.activeSelection === this.index || false
+      )
+    },
+  },
+
+  methods: {
+    handleClick() {
+      this.$emit('click', { data: this.data })
     },
   },
 }

@@ -15,6 +15,7 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
     "core-js": "^3.15.1",
+    "echarts": "^5.3.2",
     "nuxt": "^2.15.7",
     "vue-google-charts": "^0.3.3",
     "vuelidate": "^0.7.7"

@@ -42,7 +42,7 @@ export function createTableData(data) {
         const tableKeys = Object.keys(uploadedData[0])
         console.log('Keys', tableKeys)
         const headerLabels = tableKeys.map((label) => {
-          return { label, options: {} }
+          return { label: label.trim(), options: {} }
         })
         console.log('Header Labels', headerLabels)
         const headers = [...headerLabels]
@@ -68,6 +68,7 @@ export function createTableData(data) {
         tableData.body = tableBody
         tableData.error = null
         tableData.ready = true
+        tableData.numbered = true
         resolve(tableData)
       } else {
         reject(new Error('Could not create table data'))
@@ -75,5 +76,101 @@ export function createTableData(data) {
     })
   } catch {
     return new Error('Could not create table data')
+  }
+}
+
+export function validateUploads(key, headers) {
+  headers = headers.map((h) => h.label)
+  return new Promise((resolve, reject) => {
+    const err = new Error(
+      'The file uploaded cannot be verified across the selected dataset type.'
+    )
+    switch (key) {
+      case 'airlines': {
+        const rightHeaders = ['2 Letter Code', 'Company Name', 'Country']
+        checkForHeadingExistence(rightHeaders, headers, reject, resolve, err)
+
+        break
+      }
+      case 'airports': {
+        const rightHeaders = [
+          'IATA Code',
+          'ISO Alpha 3 Code',
+          'Long Name',
+          'Long Location',
+        ]
+        checkForHeadingExistence(rightHeaders, headers, reject, resolve, err)
+        break
+      }
+      case 'passengers': {
+        const rightHeaders = [
+          'Passport Number',
+          'Flight Number',
+          'Threat Level',
+          'Forename',
+          'Family Name',
+          'Gender',
+          'DOB',
+          'Nationality',
+          'Revenue',
+          'Seat Number',
+        ]
+        checkForHeadingExistence(rightHeaders, headers, reject, resolve, err)
+        break
+      }
+      case 'aircrafts': {
+        const rightHeaders = [
+          'Aircraft Number',
+          'Passenger Capacity',
+          'Crew Capacity',
+        ]
+        checkForHeadingExistence(rightHeaders, headers, reject, resolve, err)
+        break
+      }
+      case 'flights': {
+        const rightHeaders = [
+          'Flight Number',
+          'Aircraft',
+          'Departure',
+          'Arrival',
+          'Terminal',
+        ]
+        checkForHeadingExistence(rightHeaders, headers, reject, resolve, err)
+        break
+      }
+      case 'threats': {
+        const rightHeaders = [
+          'Threat ID',
+          'Passport Number',
+          'Threat Level',
+          'Terrorism',
+          'Narcotics',
+          'Smuggling',
+          'Illegal Immigration',
+        ]
+        checkForHeadingExistence(rightHeaders, headers, reject, resolve, err)
+        break
+      }
+
+      default:
+        return err
+    }
+  })
+}
+
+function checkForHeadingExistence(rightHeaders, headers, reject, resolve, err) {
+  const found = rightHeaders.find((h) => {
+    return !headers.includes(h)
+  })
+  if (found) {
+    let requiredHeadersError = 'File must contain the following columns: '
+    rightHeaders.forEach((h, i) => {
+      requiredHeadersError +=
+        i === rightHeaders.length - 1 ? 'and ' + h + '.' : h + ', '
+    })
+    err += ' ' + requiredHeadersError
+    reject(err)
+  } else {
+    resolve()
   }
 }

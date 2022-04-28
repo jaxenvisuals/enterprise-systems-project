@@ -8,21 +8,28 @@
           <p class="text-sm font-bold leading-none">Select Dataset to upload</p>
           <div class="mt-1">
             <SelectMenu
-              v-model="form.set"
-              :value="form.set"
+              v-model="set"
+              :value="set"
               :options="options"
               label-key="name"
               value-key="value"
             />
 
-            <p v-if="file.tried" class="mt-px text-xs leading-none">
-              {{ file.name || 'No file selected' }}
+            <p
+              v-if="file.tried && !file.name"
+              class="mt-px text-xs leading-none"
+            >
+              {{ 'No file selected' }}
             </p>
           </div>
 
           <div class="mt-1">
             <AppButton
-              title="Upload File"
+              :title="`${
+                file.name && file.tried
+                  ? 'Change File (' + file.name + ')'
+                  : 'Upload File'
+              }`"
               dark
               class="mb-3"
               @click="showFileUploader"
@@ -33,14 +40,23 @@
     </div>
     <input :ref="id" type="file" class="hidden" @change="processFile($event)" />
 
-    <div class="mt-5">
+    <div v-if="tableVisible" class="mt-5">
+      <div class="flex justify-end mb-3">
+        <AppButton
+          :title="`Save Data Set`"
+          dark
+          class="mb-3"
+          @click="saveDataSet"
+        />
+      </div>
       <CustomTable :table-data="tableData" />
     </div>
   </div>
 </template>
 
 <script>
-import { excelToJSON, createTableData } from '@/store/helpers'
+import { excelToJSON, createTableData, validateUploads } from '@/store/helpers'
+import { dataSets } from '@/store/constants'
 export default {
   name: 'UploadFile',
 
@@ -49,28 +65,19 @@ export default {
 
     return {
       w,
-      form: {
-        set: null,
-      },
+      set: null,
       file: {
         tried: null,
         name: null,
         raw: null,
+        rawConvertedData: null,
       },
 
       id: 0,
 
-      options: [
-        {
-          name: 'Airplanes',
-          value: 'airplanes',
-        },
-        {
-          name: 'Passengers',
-          value: 'passengers',
-        },
-      ],
+      options: dataSets,
 
+      tableVisible: false,
       tableData: {
         ready: false,
         error: null,
@@ -80,7 +87,13 @@ export default {
     }
   },
 
-  computed: {},
+  watch: {
+    set(val) {
+      if (!val) {
+        this.clearTable()
+      }
+    },
+  },
 
   mounted() {
     this.id = this.$uuid()
@@ -88,6 +101,9 @@ export default {
 
   methods: {
     showFileUploader() {
+      if (!this.set) {
+        return alert('Select a dataset type you wish to upload')
+      }
       this.$refs[this.id].click()
     },
 
@@ -95,8 +111,7 @@ export default {
       this.file.tried = true
       const file = e?.target?.files[0]
       if (!file) {
-        this.file.raw = null
-        this.file.name = null
+        this.clearTable()
         return alert('Select a file')
       }
       this.file.raw = file
@@ -109,9 +124,11 @@ export default {
       excelToJSON(file)
         .then((data) => {
           console.log('DATA', data)
+          this.file.rawConvertedData = data
           this.createTableData(data)
         })
         .catch((err) => {
+          this.clearTable(err)
           alert(err)
         })
     },
@@ -120,13 +137,42 @@ export default {
       try {
         createTableData(data).then((tableData) => {
           this.tableData = tableData
+          this.tableVisible = true
         })
       } catch (err) {
         console.log(err)
-        this.tableData.error = err
-        this.tableData.ready = false
-        this.tableData.body = null
-        this.tableData.header = null
+        this.clearTable(err)
+      }
+    },
+
+    clearTable(err) {
+      this.file.raw = null
+      this.file.rawConvertedData = null
+      this.file.name = null
+      this.tableVisible = false
+      this.tableData.error = err
+      this.tableData.ready = false
+      this.tableData.body = null
+      this.tableData.header = null
+    },
+
+    saveDataSet() {
+      try {
+        validateUploads(this.set, this.tableData.header)
+          .then(() => {
+            this.$store.commit('setDataSets', {
+              key: this.set,
+              value: {
+                raw: JSON.parse(JSON.stringify(this.file.rawConvertedData)),
+                tableData: JSON.parse(JSON.stringify(this.tableData)),
+              },
+            })
+          })
+          .catch((err) => {
+            alert(err)
+          })
+      } catch (err) {
+        console.log(err)
       }
     },
   },
