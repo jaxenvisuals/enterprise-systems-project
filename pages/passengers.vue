@@ -2,12 +2,15 @@
   <div class="px-4 py-6 text-black">
     <p class="text-lg font-bold">Passengers</p>
 
-    <div v-if="stateDataSet" class="mt-4 grid grid-cols-12">
+    <div v-if="computedPassengers" class="mt-4 grid grid-cols-12">
       <div
         class="bg-white border shadow-md overflow-auto"
         :class="[!analysis.visible ? 'col-span-12' : 'col-span-6']"
       >
-        <CustomTable :table-data="stateDataSet.tableData" :options="options" />
+        <CustomTable
+          :table-data="computedPassengers.tableData"
+          :options="options"
+        />
       </div>
       <div v-if="analysis.visible" class="col-span-6">
         <div ref="e-chart"></div>
@@ -38,6 +41,10 @@ export default {
       return this.$store.getters.dataSets[this.$route.name] || null
     },
 
+    computedThreats() {
+      return this.$store.getters.computedThreats || null
+    },
+
     options() {
       return {
         clickable: true,
@@ -45,6 +52,10 @@ export default {
           handleRowClick: this.handleClick,
         },
       }
+    },
+
+    computedPassengers() {
+      return this.$store.getters.computedPassengers
     },
   },
 

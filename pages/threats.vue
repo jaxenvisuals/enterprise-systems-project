@@ -2,8 +2,8 @@
   <div class="px-4 py-6 text-black">
     <p class="text-lg font-bold">Threats</p>
 
-    <div v-if="stateDataSet" class="mt-4">
-      <CustomTable :table-data="stateDataSet.tableData" />
+    <div v-if="computedThreats" class="mt-4">
+      <CustomTable :table-data="computedThreats.tableData" />
     </div>
   </div>
 </template>
@@ -13,9 +13,11 @@ export default {
   name: 'ThreatsPage',
 
   computed: {
-    stateDataSet() {
-      return this.$store.getters.dataSets[this.$route.name] || null
+    computedThreats() {
+      return this.$store.getters.computedThreats || null
     },
   },
+
+  methods: {},
 }
 </script>

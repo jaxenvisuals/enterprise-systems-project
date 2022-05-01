@@ -143,10 +143,10 @@ export function validateUploads(key, headers) {
           'Threat ID',
           'Passport Number',
           'Threat Level',
-          'Terrorism',
-          'Narcotics',
-          'Smuggling',
-          'Illegal Immigration',
+          'Terrorism (50%)',
+          'Smuggling (20%)',
+          'Narcotics (15%)',
+          'Illegal Immigration (15%)',
         ]
         checkForHeadingExistence(rightHeaders, headers, reject, resolve, err)
         break
