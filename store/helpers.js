@@ -1,6 +1,40 @@
+import { Parser } from 'xml2js'
+
+const names = [
+  ['2 Letter Code', '_2_Letter_Code'],
+  ['Company Name', 'Company_Name'],
+  ['Country'],
+  ['IATA Code', 'IATA_Code'],
+  ['ISO Alpha 3 Code', 'ISO_Alpha_3_Code'],
+  ['Long Name', 'Long_Name'],
+  ['Long Location', 'Long_Location'],
+  ['Passport Number', 'Passport_Number'],
+  ['Flight Number', 'Flight_Number'],
+  ['Forename'],
+  ['Family Name', 'Family_Name'],
+  ['Gender'],
+  ['DOB'],
+  ['Nationality'],
+  ['Revenue'],
+  ['Seat Number', 'Seat_Number'],
+  ['Aircraft Number', 'Aircraft_Number'],
+  ['Passenger Capacity', 'Passenger_Capacity'],
+  ['Crew Capacity', 'Crew_Capacity'],
+  ['Aircraft'],
+  ['Departure'],
+  ['Arrival'],
+  ['Terminal'],
+  ['Threat ID', 'Threat_ID'],
+  ['Threat Level', 'Threat_Level'],
+  ['Terrorism (50%)', 'Terrorism_50'],
+  ['Smuggling (20%)', 'Smuggling_20'],
+  ['Narcotics (15%)', 'Narcotics_15'],
+  ['Illegal Immigration (15%)', 'Illegal_Immigration_15'],
+]
+
 export function excelToJSON(file) {
-  try {
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
+    try {
       const reader = new FileReader()
       const w = window
       if (w) {
@@ -20,16 +54,85 @@ export function excelToJSON(file) {
           })
         }
 
-        reader.onerror = function (err) {
-          reject(new Error('ERROR', err))
+        reader.onerror = function () {
+          reject(
+            new Error('There was an error parsing the uploaded Excel file')
+          )
         }
 
         reader.readAsBinaryString(file.target.files[0])
       }
-    })
-  } catch {
-    return new Error('Could not convert File')
-  }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export function processJSONFile(file) {
+  return new Promise((resolve, reject) => {
+    try {
+      const reader = new FileReader()
+      reader.onload = function (e) {
+        const converted = e.target.result
+        let data = JSON.parse(converted)
+        data = data[Object.keys(data)[0]]
+
+        if (data) {
+          resolve(JSON.stringify(data))
+        } else {
+          reject(new Error('There was an error parsing the uploaded JSON file'))
+        }
+      }
+
+      reader.readAsBinaryString(file.target.files[0])
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export function processXMLFile(file) {
+  const parser = new Parser()
+
+  return new Promise((resolve, reject) => {
+    try {
+      const reader = new FileReader()
+      reader.onload = function (e) {
+        const converted = e.target.result
+        parser
+          .parseStringPromise(converted)
+          .then((res) => {
+            const keys = Object.keys(res.root)
+            let data = res.root[keys[0]]
+
+            data = data.map((d) => {
+              const newData = {}
+              const k = Object.keys(d)
+              k.forEach((k) => {
+                newData[nameMapping(k)] = d[k][0]
+              })
+
+              return newData
+            })
+
+            if (data) {
+              resolve(JSON.stringify(data))
+            } else {
+              reject(
+                new Error('There was an error parsing the uploaded XML file')
+              )
+            }
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      }
+
+      reader.readAsBinaryString(file.target.files[0])
+    } catch (e) {
+      reject(e)
+    }
+  })
 }
 
 export function createTableData(data) {
@@ -37,17 +140,13 @@ export function createTableData(data) {
     const tableData = {}
     return new Promise((resolve, reject) => {
       const uploadedData = JSON.parse(data)
-      console.log('Uploaded', uploadedData)
       if (uploadedData.length) {
         const tableKeys = Object.keys(uploadedData[0])
-        console.log('Keys', tableKeys)
         const headerLabels = tableKeys.map((label) => {
           return { label: label.trim(), options: {} }
         })
-        console.log('Header Labels', headerLabels)
         const headers = [...headerLabels]
         tableData.header = headers
-        console.log('Header Labels', headerLabels)
 
         const bodyData = uploadedData.map((row) => {
           const rowData = []
@@ -62,7 +161,6 @@ export function createTableData(data) {
             options: {},
           }
         })
-        console.log('BodyData', bodyData)
         const tableBody = bodyData
 
         tableData.body = tableBody
@@ -173,4 +271,26 @@ function checkForHeadingExistence(rightHeaders, headers, reject, resolve, err) {
   } else {
     resolve()
   }
+}
+
+// eslint-disable-next-line no-empty-pattern
+export function fileTypeChecker(fileName) {
+  const allowedDocumentExtensions = /(\.json|\.xlsx|\.xls|\.xml)$/i
+
+  if (!allowedDocumentExtensions.exec(fileName)) {
+    alert('Unsupported file type selected')
+    return false
+  } else {
+    return fileName.split('.')[1]
+  }
+}
+
+function nameMapping(name) {
+  const index = names.findIndex((n) => {
+    return n.includes(name)
+  })
+
+  if (index < 0) return name
+
+  return names[index][0]
 }

@@ -38,7 +38,13 @@
         </div>
       </div>
     </div>
-    <input :ref="id" type="file" class="hidden" @change="processFile($event)" />
+    <input
+      :ref="id"
+      type="file"
+      class="hidden"
+      accept=".json, .xlsx, .xls, .xml"
+      @change="processFile($event)"
+    />
 
     <div v-if="tableVisible" class="mt-5">
       <div class="flex justify-end mb-3">
@@ -55,7 +61,14 @@
 </template>
 
 <script>
-import { excelToJSON, createTableData, validateUploads } from '@/store/helpers'
+import {
+  excelToJSON,
+  createTableData,
+  validateUploads,
+  fileTypeChecker,
+  processJSONFile,
+  processXMLFile,
+} from '@/store/helpers'
 import { dataSets } from '@/store/constants'
 export default {
   name: 'UploadFile',
@@ -114,16 +127,65 @@ export default {
         this.clearTable()
         return alert('Select a file')
       }
-      this.file.raw = file
-      this.file.name = file.name
+      const extension = fileTypeChecker(file.name)
+      if (!extension) {
+        return alert(
+          'Invalid file. You can only upload files in either a JSON, XML, Microsoft Access DB or excel format'
+        )
+      }
 
-      this.convertExcelToJSON(e)
+      this.file.name = file.name
+      this.file.raw = file
+
+      switch (true) {
+        case extension === 'json': {
+          this.processJSONFile(e)
+          break
+        }
+
+        case extension === 'xlsx' || extension === 'xls': {
+          this.convertExcelToJSON(e)
+          break
+        }
+
+        case extension === 'xml': {
+          this.processXMLFile(e)
+          break
+        }
+
+        default:
+          alert('Not sure of the content of this file')
+          break
+      }
     },
 
     convertExcelToJSON(file) {
       excelToJSON(file)
         .then((data) => {
-          console.log('DATA', data)
+          this.file.rawConvertedData = data
+          this.createTableData(data)
+        })
+        .catch((err) => {
+          this.clearTable(err)
+          alert(err)
+        })
+    },
+
+    processJSONFile(file) {
+      processJSONFile(file)
+        .then((data) => {
+          this.file.rawConvertedData = data
+          this.createTableData(data)
+        })
+        .catch((err) => {
+          this.clearTable(err)
+          alert(err)
+        })
+    },
+
+    processXMLFile(file) {
+      processXMLFile(file)
+        .then((data) => {
           this.file.rawConvertedData = data
           this.createTableData(data)
         })
@@ -140,7 +202,6 @@ export default {
           this.tableVisible = true
         })
       } catch (err) {
-        console.log(err)
         this.clearTable(err)
       }
     },
@@ -163,7 +224,7 @@ export default {
             this.$store.commit('setDataSets', {
               key: this.set,
               value: {
-                raw: JSON.parse(JSON.stringify(this.file.rawConvertedData)),
+                raw: JSON.stringify(this.file.rawConvertedData),
                 tableData: JSON.parse(JSON.stringify(this.tableData)),
               },
             })
@@ -171,9 +232,7 @@ export default {
           .catch((err) => {
             alert(err)
           })
-      } catch (err) {
-        console.log(err)
-      }
+      } catch (err) {}
     },
   },
 }
