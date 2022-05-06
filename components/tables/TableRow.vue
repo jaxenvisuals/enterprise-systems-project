@@ -1,14 +1,15 @@
 <template>
   <tr
-    class="px-2 pt-2 table-body relative"
+    class="relative px-2 pt-2 table-body"
     :class="[
       { 'cursor-pointer': options.clickable },
       { 'bg-app-gray-150': selected },
+      data.options.rowClass,
     ]"
     @click="handleClick"
   >
     <td v-if="numbered" class="px-2 py-1 text-sm leading-snug text-left">
-      {{ index + 1 }}
+      {{ data.serial }}
     </td>
     <td
       v-for="(body, i) in data.values"

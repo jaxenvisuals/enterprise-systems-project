@@ -57,7 +57,14 @@ export const getters = {
           0
         )
 
-        row.values[threatLevelHeaderIndex].label = getThreatLevel(sum)
+        const level = getThreatLevel(sum)
+        row.values[threatLevelHeaderIndex].label = level
+        row.options.rowClass =
+          level === 'High'
+            ? 'bg-red-400 bg-opacity-20'
+            : level === 'Medium'
+            ? 'bg-yellow-400 bg-opacity-20'
+            : ''
         return row
       })
 

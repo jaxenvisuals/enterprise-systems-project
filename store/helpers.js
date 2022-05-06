@@ -148,7 +148,7 @@ export function createTableData(data) {
         const headers = [...headerLabels]
         tableData.header = headers
 
-        const bodyData = uploadedData.map((row) => {
+        const bodyData = uploadedData.map((row, i) => {
           const rowData = []
           tableKeys.forEach((k) => {
             rowData.push({
@@ -159,6 +159,7 @@ export function createTableData(data) {
           return {
             values: [...rowData],
             options: {},
+            serial: i + 1,
           }
         })
         const tableBody = bodyData
