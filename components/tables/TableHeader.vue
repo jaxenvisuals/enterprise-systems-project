@@ -3,7 +3,16 @@
     <tr>
       <th
         v-if="numbered"
-        class="px-2 py-1 text-sm font-bold leading-snug text-left  hover:opacity-70"
+        class="
+          px-2
+          py-1
+          text-sm
+          font-bold
+          leading-snug
+          text-left
+          hover:opacity-70
+          select-none
+        "
         :class="[{ 'cursor-pointer': sortable }]"
         @click="emitSortKey(null)"
       >
@@ -20,7 +29,16 @@
       <th
         v-for="(header, i) in data"
         :key="i"
-        class="px-2 py-1 text-sm font-bold leading-snug text-left  hover:opacity-70"
+        class="
+          px-2
+          py-1
+          text-sm
+          font-bold
+          leading-snug
+          text-left
+          hover:opacity-70
+          select-none
+        "
         :class="[{ 'cursor-pointer': sortable }]"
         @click="emitSortKey(i)"
       >

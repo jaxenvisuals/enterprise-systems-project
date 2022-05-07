@@ -3,8 +3,105 @@
     <p class="text-lg font-bold">Threats</p>
 
     <div v-if="computedThreats" class="">
-      <div class="mx-auto mb-4">
-        <div ref="e-pie" class="flex justify-center"></div>
+      <div class="border-b mt-4 mb-4 shadow">
+        <button
+          class="
+            px-4
+            py-4
+            text-sm
+            font-bold
+            border-b
+            flex
+            justify-between
+            items-center
+            focus:outline-none
+            rounded-none
+            w-full
+          "
+          @click="toggleDataVisualization"
+        >
+          Visualize data
+          <MaterialIcon
+            :icon="visualizeData ? 'expand_less' : 'expand_more'"
+            class="text-sm"
+          />
+        </button>
+
+        <div v-if="visualizeData" class="mt-2">
+          <div class="mx-auto flex flex-col justify-center">
+            <div class="px-4">
+              <div class="grid grid-cols-4">
+                <div class="">
+                  <p class="text-center text-sm font-bold">
+                    {{ threatCharts[0].title }}
+                  </p>
+                  <div
+                    ref="e-pie-threat-category-1"
+                    class="flex justify-center"
+                  ></div>
+                </div>
+                <div class="">
+                  <p class="text-center text-sm font-bold">
+                    {{ threatCharts[1].title }}
+                  </p>
+                  <div
+                    ref="e-pie-threat-category-2"
+                    class="flex justify-center"
+                  ></div>
+                </div>
+                <div class="">
+                  <p class="text-center text-sm font-bold">
+                    {{ threatCharts[2].title }}
+                  </p>
+                  <div
+                    ref="e-pie-threat-category-3"
+                    class="flex justify-center"
+                  ></div>
+                </div>
+                <div class="">
+                  <p class="text-center text-sm font-bold">
+                    {{ threatCharts[3].title }}
+                  </p>
+                  <div
+                    ref="e-pie-threat-category-4"
+                    class="flex justify-center"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div>
+                <button
+                  class="
+                    text-center text-sm
+                    font-bold
+                    focus:outline-none
+                    flex
+                    justify-between
+                    items-center
+                    border-t border-b
+                    px-4
+                    py-3
+                    w-full
+                  "
+                  @click="toggleThreatLevel"
+                >
+                  Threat Level
+                  <MaterialIcon
+                    :icon="threatLevelVisible ? 'expand_less' : 'expand_more'"
+                    class="text-sm"
+                  />
+                </button>
+              </div>
+              <div
+                v-if="threatLevelVisible"
+                ref="e-pie-threat-level"
+                class="flex justify-center px-4 mb-4"
+              ></div>
+            </div>
+          </div>
+        </div>
       </div>
       <CustomTable :table-data="computedThreats.tableData" sortable />
     </div>
@@ -12,10 +109,31 @@
 </template>
 
 <script>
-import * as echarts from 'echarts'
+import { initThreatCategory, initThreatLevel } from '~/store/charts'
 
 export default {
   name: 'ThreatsPage',
+
+  data() {
+    return {
+      visualizeData: false,
+      threatLevelVisible: false,
+      threatCharts: [
+        {
+          title: 'Terrorism',
+        },
+        {
+          title: 'Smuggling',
+        },
+        {
+          title: 'Narcotics',
+        },
+        {
+          title: 'Illegal Immigration',
+        },
+      ],
+    }
+  },
 
   computed: {
     computedThreats() {
@@ -25,88 +143,45 @@ export default {
 
   mounted() {
     setTimeout(() => {
-      if (this.computedThreats) {
-        this.initPie()
+      if (this.computedThreats?.tableData) {
+        this.toggleDataVisualization()
       }
-    }, 200)
+    }, 20)
   },
 
   methods: {
-    initPie() {
-      const chartData = [
-        {
-          value: 0,
-          name: 'High',
-        },
-        {
-          value: 0,
-          name: 'Medium',
-        },
-        {
-          value: 0,
-          name: 'Low',
-        },
-      ]
-      const data = this.computedThreats.tableData
-      const threatIndex = data.header.findIndex(
-        (th) => th.label === 'Threat Level'
-      )
+    initThreatLevel() {
+      const here = this
+      initThreatLevel(here)
+    },
 
-      if (threatIndex < 0) return
+    initThreatCategory() {
+      const here = this
+      initThreatCategory(here)
+    },
 
-      data.body.forEach((th) => {
-        console.log(th.values[threatIndex])
-        if (th.values[threatIndex].label === 'High') {
-          chartData[0].value = ++chartData[0].value
-        } else if (th.values[threatIndex].label === 'Medium') {
-          chartData[1].value = ++chartData[1].value
-        } else if (th.values[threatIndex].label === 'Low') {
-          chartData[2].value = ++chartData[2].value
-        }
-      })
-
-      const myChart = echarts.init(this.$refs['e-pie'], null, {
-        width: 600,
-        height: 400,
-      })
-
-      const option = {
-        color: ['red', 'gold', 'gray'],
-        legend: {
-          top: 'bottom',
-        },
-        toolbox: {
-          show: true,
-          feature: {
-            mark: { show: true },
-            dataView: { show: false, readOnly: false },
-            restore: { show: false },
-            saveAsImage: { show: false },
-          },
-        },
-        series: [
-          {
-            name: 'Threat Data',
-            type: 'pie',
-            radius: '50%',
-            data: chartData.map((c) => {
-              return {
-                name: c.name + ': ' + c.value,
-                value: c.value,
-              }
-            }),
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
-              },
-            },
-          },
-        ],
+    toggleDataVisualization() {
+      this.visualizeData = !this.visualizeData
+      if (this.visualizeData) {
+        setTimeout(() => {
+          if (this.computedThreats) {
+            this.initThreatCategory()
+          }
+        }, 10)
+      } else {
+        this.threatLevelVisible = false
       }
+    },
 
-      option && myChart.setOption(option)
+    toggleThreatLevel() {
+      if (this.visualizeData) {
+        this.threatLevelVisible = !this.threatLevelVisible
+        if (this.threatLevelVisible) {
+          setTimeout(() => {
+            this.initThreatLevel()
+          }, 30)
+        }
+      }
     },
   },
 }

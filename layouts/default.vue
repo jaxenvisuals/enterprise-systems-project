@@ -52,7 +52,17 @@
       </div>
     </div>
     <!-- rendered classes from JS file  to be included in tailwind -->
-    <div class="bg-red-400 bg-opacity-20 bg-yellow-400"></div>
+    <div
+      class="
+        bg-red-400
+        bg-[#67e0e3]
+        bg-[#37a2da]
+        bg-[#fd666c]
+        bg-opacity-60
+        bg-yellow-400
+        text-white
+      "
+    ></div>
   </div>
 </template>
 

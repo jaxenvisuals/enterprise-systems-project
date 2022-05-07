@@ -61,7 +61,9 @@ export default {
       const data = JSON.parse(JSON.stringify(this.tableData))
 
       const sorted = _.sortBy(data.body, (k) => {
-        return k.values[this.sortIndex].label
+        return Number(k.values[this.sortIndex].label)
+          ? Number(k.values[this.sortIndex].label)
+          : k.values[this.sortIndex].label
       })
 
       data.body = this.asc ? sorted : sorted.reverse()

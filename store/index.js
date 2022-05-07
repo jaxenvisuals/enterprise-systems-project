@@ -61,10 +61,10 @@ export const getters = {
         row.values[threatLevelHeaderIndex].label = level
         row.options.rowClass =
           level === 'High'
-            ? 'bg-red-400 bg-opacity-20'
+            ? 'bg-[#fd666c]'
             : level === 'Medium'
-            ? 'bg-yellow-400 bg-opacity-20'
-            : ''
+            ? 'bg-[#37a2da]'
+            : 'bg-[#67e0e3]'
         return row
       })
 
