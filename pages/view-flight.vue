@@ -1,11 +1,15 @@
 <template>
   <div v-if="flight" class="px-4 py-6 text-black">
-    <p class="text-lg font-bold">Flight {{ flight.flightNum.raw }}</p>
+    <p class="text-lg font-bold">
+      Flight {{ flight.flightNum.raw || 'Invalid Flight Number' }}
+    </p>
 
     <div class="mt-3">
       <div class="grid grid-cols-4 shadow border divide-x">
         <div class="px-4 py-2">
-          <p class="font-bold text-sm">Flight {{ flight.flightNum.raw }}</p>
+          <p class="font-bold text-sm">
+            Flight {{ flight.flightNum.raw || 'Invalid Flight Number' }}
+          </p>
           <div class="text-xs mt-1">
             <p v-for="(a, i) in refinedData.airline" :key="i" class="mt-px">
               {{ a.label }}: {{ flight.flightNum.airline[a.index].label }}
@@ -52,6 +56,11 @@
 
     <div v-if="allPassengers" class="mt-4">
       <CustomTable :table-data="allPassengers.tableData" />
+      <CustomTable
+        v-if="passengersThreats"
+        :table-data="passengersThreats"
+        class="mt-3"
+      />
     </div>
   </div>
 </template>
@@ -73,64 +82,108 @@ export default {
 
   computed: {
     flight() {
-      return this.$store.state.activeFlight?.selected
+      return this?.$store?.state?.activeFlight?.selected
     },
 
     allPassengers() {
-      let passengers = this.$store.state.dataSets.passengers
-      if (!(passengers && this.flight)) return null
+      let passengers = this?.$store?.state?.dataSets?.passengers
+      if (!(passengers && this?.flight)) return null
 
-      passengers = JSON.parse(JSON.stringify(passengers))
-      passengers.tableData.body = this.flight.flightNum.details
+      passengers = JSON?.parse(JSON?.stringify(passengers))
+      passengers.tableData.body = this?.flight?.flightNum?.details
 
       return passengers
     },
 
     refinedData() {
       return {
-        aircrafts: this.keys.aircraft.map((a) => {
+        aircrafts: this?.keys?.aircraft?.map((a) => {
           return {
             label: a,
             index: getHeaderIndex(
-              this.$store.state.dataSets.aircrafts.tableData,
+              this?.$store?.state?.dataSets?.aircrafts?.tableData,
               a
             ),
           }
         }),
-        departure: this.keys.departure.map((a) => {
+        departure: this?.keys?.departure?.map((a) => {
           return {
             label: a,
             index: getHeaderIndex(
-              this.$store.state.dataSets.airports.tableData,
+              this?.$store?.state?.dataSets?.airports?.tableData,
               a
             ),
           }
         }),
-        arrival: this.keys.arrival.map((a) => {
+        arrival: this?.keys?.arrival?.map((a) => {
           return {
             label: a,
             index: getHeaderIndex(
-              this.$store.state.dataSets.airports.tableData,
+              this?.$store?.state?.dataSets?.airports?.tableData,
               a
             ),
           }
         }),
-        airline: this.keys.airline.map((a) => {
+        airline: this?.keys?.airline?.map((a) => {
           return {
             label: a,
             index: getHeaderIndex(
-              this.$store.state.dataSets.airlines.tableData,
+              this?.$store?.state?.dataSets?.airlines?.tableData,
               a
             ),
           }
         }),
       }
     },
+
+    computedThreats() {
+      return this.$store.getters.computedThreats
+    },
+
+    passengersThreats() {
+      if (!this.computedThreats?.tableData) return null
+
+      // find index of passport number in flight passengers
+      const pNumIndex = getHeaderIndex(
+        this.allPassengers.tableData,
+        'Passport Number'
+      )
+      if (!(pNumIndex >= 0)) return null
+      // get array of all passport numbers in flight passengers
+      const allPNums = []
+      this.allPassengers.tableData.body.forEach((p) => {
+        allPNums.push(p.values[pNumIndex].label)
+      })
+
+      if (allPNums.length < 1) return null
+
+      // get index of passport number in comp threats
+      const compThreats = JSON.parse(
+        JSON.stringify(this.computedThreats?.tableData)
+      )
+
+      const compThreatsPNumIndex = getHeaderIndex(
+        compThreats,
+        'Passport Number'
+      )
+
+      if (!(compThreatsPNumIndex >= 0)) return null
+
+      const flightThreatsBody = compThreats.body.filter((r) => {
+        return allPNums.includes(r.values[compThreatsPNumIndex].label)
+      })
+
+      if (!flightThreatsBody.length) return null
+
+      compThreats.body = flightThreatsBody
+      // filter all matching passport numbers and return from comp threats
+      return compThreats
+    },
   },
 }
 
 function getHeaderIndex(table, label) {
-  const index = table.header.findIndex((h) => h.label === label)
+  const index = table?.header?.findIndex((h) => h?.label === label)
 
   return index < 0 ? false : index
 }
