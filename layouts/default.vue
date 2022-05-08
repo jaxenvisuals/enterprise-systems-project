@@ -112,3 +112,15 @@ export default {
   overflow: auto;
 }
 </style>
+
+<style lang="postcss">
+.low {
+  @apply bg-[#67e0e3];
+}
+.medium {
+  @apply bg-[#37a2da];
+}
+.high {
+  @apply bg-[#fd666c];
+}
+</style>

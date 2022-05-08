@@ -7,7 +7,7 @@
         <button
           class="
             px-4
-            py-4
+            py-3
             text-sm
             font-bold
             border-b
@@ -21,10 +21,19 @@
           @click="toggleDataVisualization"
         >
           Visualize data
-          <MaterialIcon
-            :icon="visualizeData ? 'expand_less' : 'expand_more'"
-            class="text-sm"
-          />
+
+          <div class="flex items-center">
+            <div class="flex gap-1 pr-2">
+              <AppPills label="High" theme="high" />
+              <AppPills label="Medium" theme="medium" />
+              <AppPills label="Low" theme="low" />
+            </div>
+
+            <MaterialIcon
+              :icon="visualizeData ? 'expand_less' : 'expand_more'"
+              class="text-sm"
+            />
+          </div>
         </button>
 
         <div v-if="visualizeData" class="mt-2">

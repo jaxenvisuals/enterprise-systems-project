@@ -1,5 +1,8 @@
 <template>
-  <div v-if="tableData.ready" class="w-full pt-8 pb-8 table-auto">
+  <div
+    v-if="tableData.ready"
+    class="w-full bg-white border shadow-md pt-8 table-auto"
+  >
     <table class="w-full">
       <table-header
         :data="sorted.header"

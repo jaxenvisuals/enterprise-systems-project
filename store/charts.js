@@ -51,20 +51,19 @@ export function initThreatCategory(here) {
   const reducer = (prev, current) => prev + current
 
   terrorismSum = Number.parseFloat(
-    (((terrorismSum.reduce(reducer, 0) / (50 * rowCount)) * 50) / 50) * 100
+    (terrorismSum.reduce(reducer, 0) / (50 * rowCount)) * 100
   ).toFixed(1)
 
   smugglingSum = Number.parseFloat(
-    (((smugglingSum.reduce(reducer, 0) / (20 * rowCount)) * 20) / 20) * 100
+    (smugglingSum.reduce(reducer, 0) / (20 * rowCount)) * 100
   ).toFixed(1)
 
   narcoticsSum = Number.parseFloat(
-    (((narcoticsSum.reduce(reducer, 0) / (15 * rowCount)) * 15) / 15) * 100
+    (narcoticsSum.reduce(reducer, 0) / (15 * rowCount)) * 100
   ).toFixed(1)
 
   illegalImmigrationSum = Number.parseFloat(
-    (((illegalImmigrationSum.reduce(reducer, 0) / (15 * rowCount)) * 15) / 15) *
-      100
+    (illegalImmigrationSum.reduce(reducer, 0) / (15 * rowCount)) * 100
   ).toFixed(1)
 
   const threatCategoryData = [
@@ -151,8 +150,8 @@ export function initThreatCategory(here) {
 
   const option1 = JSON.parse(JSON.stringify(option))
   option1.series[0].axisLine.lineStyle.color = [
-    [0.1, '#67e0e3'],
-    [0.45, '#37a2da'],
+    [0.05, '#67e0e3'],
+    [0.35, '#37a2da'],
     [1, '#fd666c'],
   ]
   option1.series[0].data[0].value = threatCategoryData[0].value
@@ -160,8 +159,8 @@ export function initThreatCategory(here) {
 
   const option2 = JSON.parse(JSON.stringify(option))
   option2.series[0].axisLine.lineStyle.color = [
-    [0.25, '#67e0e3'],
-    [0.65, '#37a2da'],
+    [0.2, '#67e0e3'],
+    [0.55, '#37a2da'],
     [1, '#fd666c'],
   ]
   option2.series[0].data[0].value = threatCategoryData[1].value
@@ -170,7 +169,7 @@ export function initThreatCategory(here) {
   const option3 = JSON.parse(JSON.stringify(option))
   option3.series[0].axisLine.lineStyle.color = [
     [0.33, '#67e0e3'],
-    [0.66, '#37a2da'],
+    [0.8, '#37a2da'],
     [1, '#fd666c'],
   ]
   option3.series[0].data[0].value = threatCategoryData[2].value

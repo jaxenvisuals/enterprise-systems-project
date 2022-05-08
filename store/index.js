@@ -8,6 +8,7 @@ export const state = () => {
       airlines: null,
       airports: null,
     },
+    activeFlight: null,
   }
 }
 
@@ -60,11 +61,7 @@ export const getters = {
         const level = getThreatLevel(sum)
         row.values[threatLevelHeaderIndex].label = level
         row.options.rowClass =
-          level === 'High'
-            ? 'bg-[#fd666c]'
-            : level === 'Medium'
-            ? 'bg-[#37a2da]'
-            : 'bg-[#67e0e3]'
+          level === 'High' ? 'high' : level === 'Medium' ? 'medium' : 'low'
         return row
       })
 
@@ -140,6 +137,18 @@ export const getters = {
     }
     return null
   },
+
+  getRow(state) {
+    return (args) => {
+      return findRow(state, args)
+    }
+  },
+
+  filterRow(state) {
+    return (args) => {
+      return filterRow(state, args)
+    }
+  },
 }
 
 export const mutations = {
@@ -150,6 +159,10 @@ export const mutations = {
 
   setState(state, payload) {
     state.dataSets = payload
+  },
+
+  setActiveFlightView(state, payload) {
+    state.activeFlight = payload
   },
 }
 
@@ -175,4 +188,48 @@ function getThreatLevel(sum) {
   }
 
   return level
+}
+
+function getHeaderIndex(table, label) {
+  const index = table.header.findIndex((h) => h.label === label)
+
+  return index < 0 ? false : index
+}
+
+function getRow(table, valueIndex, id) {
+  const idx = table.body.findIndex((r) => r.values[valueIndex].label === id)
+
+  return idx < 0 ? false : table.body[idx]
+}
+
+function getFilteredRow(table, valueIndex, id) {
+  const filtered = table.body.filter((r) => r.values[valueIndex].label === id)
+
+  return filtered.length < 1 ? false : filtered
+}
+
+function findRow(state, { id, data, key }) {
+  if (!state.dataSets[data]?.tableData?.body?.length) return null
+
+  const table = JSON.parse(JSON.stringify(state.dataSets[data].tableData))
+  const valueIndex = getHeaderIndex(table, key)
+  if (valueIndex < 0) return false
+
+  const row = getRow(table, valueIndex, id)
+
+  return row.values
+}
+
+function filterRow(state, { id, data, key }) {
+  if (!state.dataSets[data]?.tableData?.body?.length) return null
+
+  const table = JSON.parse(JSON.stringify(state.dataSets[data].tableData))
+  const valueIndex = getHeaderIndex(table, key)
+  if (valueIndex < 0) return false
+
+  const filtered = getFilteredRow(table, valueIndex, id)
+
+  if (!filtered) return false
+
+  return filtered
 }
