@@ -1,35 +1,40 @@
 import { Parser } from 'xml2js'
+import moment from 'moment'
 
 const names = [
-  ['2 Letter Code', '_2_Letter_Code'],
-  ['Company Name', 'Company_Name'],
-  ['Country'],
-  ['IATA Code', 'IATA_Code'],
-  ['ISO Alpha 3 Code', 'ISO_Alpha_3_Code'],
-  ['Long Name', 'Long_Name'],
-  ['Long Location', 'Long_Location'],
-  ['Passport Number', 'Passport_Number'],
-  ['Flight Number', 'Flight_Number'],
-  ['Forename'],
-  ['Family Name', 'Family_Name'],
-  ['Gender'],
-  ['DOB'],
-  ['Nationality'],
-  ['Revenue'],
-  ['Seat Number', 'Seat_Number'],
-  ['Aircraft Number', 'Aircraft_Number'],
-  ['Passenger Capacity', 'Passenger_Capacity'],
-  ['Crew Capacity', 'Crew_Capacity'],
-  ['Aircraft'],
-  ['Departure'],
-  ['Arrival'],
-  ['Terminal'],
-  ['Threat ID', 'Threat_ID'],
-  ['Threat Level', 'Threat_Level'],
-  ['Terrorism (50%)', 'Terrorism_50'],
-  ['Smuggling (20%)', 'Smuggling_20'],
-  ['Narcotics (15%)', 'Narcotics_15'],
-  ['Illegal Immigration (15%)', 'Illegal_Immigration_15'],
+  ['2 Letter Code', '_2_Letter_Code', 'two_letter_code'],
+  ['Company Name', 'Company_Name', 'company_name'],
+  ['Country', 'country'],
+  ['IATA Code', 'IATA_Code', 'iata_code'],
+  ['ISO Alpha 3 Code', 'ISO_Alpha_3_Code', 'iso_alpha_3_code'],
+  ['Long Name', 'Long_Name', 'long_name'],
+  ['Long Location', 'Long_Location', 'long_location'],
+  ['Passport Number', 'Passport_Number', 'passport_number'],
+  ['Flight Number', 'Flight_Number', 'flight_number'],
+  ['Forename', 'forename'],
+  ['Family Name', 'Family_Name', 'family_name'],
+  ['Gender', 'gender'],
+  ['DOB', 'dob'],
+  ['Nationality', 'nationality'],
+  ['Revenue', 'revenue'],
+  ['Seat Number', 'Seat_Number', 'seat_number'],
+  ['Aircraft Number', 'Aircraft_Number', 'aircraft_number'],
+  ['Passenger Capacity', 'Passenger_Capacity', 'passenger_capacity'],
+  ['Crew Capacity', 'Crew_Capacity', 'crew_capacity'],
+  ['Aircraft', 'aircraft'],
+  ['Departure', 'departure'],
+  ['Arrival', 'arrival'],
+  ['Terminal', 'terminal'],
+  ['Threat ID', 'Threat_ID', 'threat_id'],
+  ['Threat Level', 'Threat_Level', 'threat_level'],
+  ['Terrorism (50%)', 'Terrorism_50', 'terrorism'],
+  ['Smuggling (20%)', 'Smuggling_20', 'smuggling'],
+  ['Narcotics (15%)', 'Narcotics_15', 'narcotics'],
+  [
+    'Illegal Immigration (15%)',
+    'Illegal_Immigration_15',
+    'illegal_immigration',
+  ],
 ]
 
 export function excelToJSON(file) {
@@ -286,12 +291,49 @@ export function fileTypeChecker(fileName) {
   }
 }
 
-function nameMapping(name) {
+export function nameMapping(name, reverse = false) {
   const index = names.findIndex((n) => {
     return n.includes(name)
   })
 
   if (index < 0) return name
 
-  return names[index][0]
+  return !reverse ? names[index][0] : names[index][names[index].length - 1]
+}
+
+export function refineApiData({ data }) {
+  return new Promise((resolve, reject) => {
+    try {
+      if (!data.length) return []
+      const keys = Object.keys(data[0])
+
+      data = data.map((d) => {
+        keys.forEach((k) => {
+          const mapped = nameMapping(k)
+          if (mapped !== k) {
+            d[mapped] = d[k]
+            delete d[k]
+          }
+        })
+
+        if (d.DOB) d.DOB = moment().format('DD-MM-YY')
+
+        delete d.created_at
+        delete d.deleted_at
+        delete d.updated_at
+        delete d.id
+        return d
+      })
+
+      createTableData(JSON.stringify(data))
+        .then((data) => {
+          resolve(data)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    } catch (err) {
+      reject(err)
+    }
+  })
 }

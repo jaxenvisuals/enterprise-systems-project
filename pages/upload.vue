@@ -68,6 +68,8 @@ import {
   fileTypeChecker,
   processJSONFile,
   processXMLFile,
+  nameMapping,
+  refineApiData,
 } from '@/store/helpers'
 import { dataSets } from '@/store/constants'
 export default {
@@ -221,18 +223,53 @@ export default {
       try {
         validateUploads(this.set, this.tableData.header)
           .then(() => {
-            this.$store.commit('setDataSets', {
-              key: this.set,
-              value: {
-                raw: JSON.stringify(this.file.rawConvertedData),
-                tableData: JSON.parse(JSON.stringify(this.tableData)),
-              },
+            let payload = JSON.parse(JSON.stringify(this.tableData))
+
+            const keys = payload.header.map((p) => p.label)
+            payload = payload.body.map((p) => {
+              const obj = {}
+              keys.forEach((k, i) => {
+                const mapped = nameMapping(k, true)
+                if (mapped !== k) {
+                  obj[mapped] = p.values[i].label
+                }
+              })
+
+              return obj
             })
+
+            this.saveToDB(payload)
           })
           .catch((err) => {
             alert(err)
           })
       } catch (err) {}
+    },
+
+    saveToDB(payload) {
+      this.$axios({
+        url: this.set + '/import',
+        method: 'POST',
+        data: payload,
+      })
+        .then(({ data }) => {
+          refineApiData({ data: data.data })
+            .then((data) => {
+              this.$store.commit('setDataSets', {
+                key: this.set,
+                value: {
+                  raw: null,
+                  tableData: JSON.parse(JSON.stringify(data)),
+                },
+              })
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
   },
 }

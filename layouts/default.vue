@@ -68,6 +68,7 @@
 
 <script>
 import { dataSets } from '@/store/constants'
+import { refineApiData } from '@/store/helpers'
 
 export default {
   name: 'DefaultLayout',
@@ -92,8 +93,8 @@ export default {
   },
 
   mounted() {
-    // this.$router.push('/upload')
-    this.getState()
+    // this.getState()
+    this.initApp()
   },
 
   methods: {
@@ -101,6 +102,43 @@ export default {
       const state = localStorage.getItem('state')
       if (!state) return
       this.$store.commit('setState', JSON.parse(state))
+    },
+
+    initApp() {
+      const api = [
+        'airlines',
+        'airports',
+        'aircrafts',
+        'flights',
+        'passengers',
+        'threats',
+      ]
+      const promises = []
+      api.forEach((a) => {
+        promises.push(
+          this.$axios({
+            method: 'GET',
+            url: a,
+          })
+            .then(({ data }) => {
+              refineApiData({ data })
+                .then((data) => {
+                  this.$store.commit('setDataSets', {
+                    key: a,
+                    value: { raw: null, tableData: data },
+                  })
+                })
+                .catch((err) => {
+                  console.log(err)
+                })
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+        )
+      })
+
+      Promise.all(promises)
     },
   },
 }
