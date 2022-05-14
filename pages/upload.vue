@@ -238,12 +238,22 @@ export default {
               return obj
             })
 
-            this.saveToDB(payload)
+            this.confirmSave(payload)
           })
           .catch((err) => {
             alert(err)
           })
       } catch (err) {}
+    },
+
+    confirmSave(payload) {
+      if (this.$store.state.dataSets[this.set]) {
+        if (confirm('Do you want to replace the selected datasets?')) {
+          this.saveToDB(payload)
+        }
+      } else {
+        this.saveToDB(payload)
+      }
     },
 
     saveToDB(payload) {
@@ -264,10 +274,12 @@ export default {
               })
             })
             .catch((err) => {
+              alert('There was an issue after saving your data')
               console.log(err)
             })
         })
         .catch((err) => {
+          alert('Could not save your data to our database')
           console.log(err)
         })
     },

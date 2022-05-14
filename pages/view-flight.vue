@@ -88,10 +88,7 @@
       </div>
 
       <div class="mt-4">
-        <CollapsibleChart
-          :data="{ tableData: passengersThreats }"
-          :opened="false"
-        />
+        <CollapsibleChart :data="{ tableData: passengersThreats }" />
       </div>
     </div>
 
