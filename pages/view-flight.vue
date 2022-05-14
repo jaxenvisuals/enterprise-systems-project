@@ -5,20 +5,20 @@
     </p>
 
     <div class="mt-3">
-      <div class="grid grid-cols-4 shadow border divide-x">
+      <div class="grid grid-cols-4 border divide-x shadow">
         <div class="px-4 py-2">
-          <p class="font-bold text-sm">
+          <p class="text-sm font-bold">
             Flight {{ flight.flightNum.raw || 'Invalid Flight Number' }}
           </p>
-          <div class="text-xs mt-1">
+          <div class="mt-1 text-xs">
             <p v-for="(a, i) in refinedData.airline" :key="i" class="mt-px">
               {{ a.label }}: {{ flight.flightNum.airline[a.index].label }}
             </p>
           </div>
         </div>
         <div class="px-4 py-2">
-          <p class="font-bold text-sm">Aircraft {{ flight.aircraft.raw }}</p>
-          <div class="text-xs mt-1">
+          <p class="text-sm font-bold">Aircraft {{ flight.aircraft.raw }}</p>
+          <div class="mt-1 text-xs">
             <p v-for="(a, i) in refinedData.aircrafts" :key="i" class="mt-px">
               {{ a.label }}: {{ flight.aircraft.details[a.index].label }}
             </p>
@@ -30,8 +30,8 @@
         </div>
 
         <div class="px-4 py-2">
-          <p class="font-bold text-sm">Departure</p>
-          <div class="text-xs mt-1">
+          <p class="text-sm font-bold">Departure</p>
+          <div class="mt-1 text-xs">
             <p v-for="(a, i) in refinedData.departure" :key="i" class="mt-px">
               {{ a.label }}: {{ flight.dept.details[a.index].label }}
             </p>
@@ -39,18 +39,25 @@
         </div>
 
         <div class="py-2">
-          <p class="px-4 font-bold text-sm">Arrival</p>
-          <div class="text-xs mt-1">
+          <p class="px-4 text-sm font-bold">Arrival</p>
+          <div class="mt-1 text-xs">
             <div class="px-4">
               <p v-for="(a, i) in refinedData.arrival" :key="i" class="mt-px">
                 {{ a.label }}: {{ flight.arr.details[a.index].label }}
               </p>
             </div>
-            <p class="mt-2 border-t pt-2 px-4">
+            <p class="px-4 pt-2 mt-2 border-t">
               Terminal: {{ flight.term.raw }}
             </p>
           </div>
         </div>
+      </div>
+
+      <div class="mt-4">
+        <CollapsibleChart
+          :data="{ tableData: passengersThreats }"
+          :opened="false"
+        />
       </div>
     </div>
 

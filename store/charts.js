@@ -1,7 +1,7 @@
 import * as echarts from 'echarts'
 
 export function initThreatCategory(here) {
-  const data = here.computedThreats.tableData
+  const data = here.computedThreatsData.tableData
   const threatNames = [
     'Terrorism (50%)',
     'Smuggling (20%)',
@@ -200,7 +200,7 @@ export function initThreatLevel(here) {
       name: 'Low',
     },
   ]
-  const data = here.computedThreats.tableData
+  const data = here.computedThreatsData.tableData
   const threatIndex = data.header.findIndex((th) => th.label === 'Threat Level')
 
   if (threatIndex < 0) return
