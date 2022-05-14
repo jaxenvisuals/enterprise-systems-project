@@ -3,7 +3,11 @@
     <p class="text-lg font-bold">Airlines</p>
 
     <div v-if="stateDataSet" class="mt-4">
-      <CustomTable :table-data="stateDataSet.tableData" />
+      <CustomTable
+        :table-data="stateDataSet.tableData"
+        :options="{ serial: true }"
+        sortable
+      />
     </div>
   </div>
 </template>

@@ -9,7 +9,7 @@
     @click="handleClick"
   >
     <td v-if="numbered" class="px-2 py-1 text-sm leading-snug text-left">
-      {{ data.serial }}
+      {{ options.serial ? data.serial : index + 1 }}
     </td>
     <td
       v-for="(body, i) in data.values"

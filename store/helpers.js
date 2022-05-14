@@ -284,7 +284,14 @@ export function fileTypeChecker(fileName) {
   const allowedDocumentExtensions = /(\.json|\.xlsx|\.xls|\.xml)$/i
 
   if (!allowedDocumentExtensions.exec(fileName)) {
-    alert('Unsupported file type selected')
+    this.$store.commit('pushToast', {
+      title: 'Error',
+      desc: `Unsupported file type selected`,
+      status: 'error',
+      errCode: '',
+      errMsg: '',
+      autoClose: true,
+    })
     return false
   } else {
     return fileName.split('.')[1]

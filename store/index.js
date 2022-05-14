@@ -9,6 +9,7 @@ export const state = () => {
       airports: null,
     },
     activeFlight: null,
+    toasts: [],
   }
 }
 
@@ -240,6 +241,24 @@ export const mutations = {
 
   setActiveFlightView(state, payload) {
     state.activeFlight = payload
+  },
+
+  pushToast(state, toast) {
+    const id = this.$uuid()
+    state.toasts.push({
+      id,
+      ...toast,
+    })
+  },
+
+  popToast(state, { id }) {
+    if (!id) return
+    const toasts = state.toasts
+    const index = toasts.findIndex((toast) => toast.id === id)
+
+    if (index < 0) return
+
+    toasts.splice(index, 1)
   },
 }
 

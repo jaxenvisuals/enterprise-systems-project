@@ -63,6 +63,8 @@
         text-white
       "
     ></div>
+
+    <ToastNotifications />
   </div>
 </template>
 
@@ -138,7 +140,16 @@ export default {
         )
       })
 
-      Promise.all(promises)
+      Promise.all(promises).then(() => {
+        this.$store.commit('pushToast', {
+          title: 'Datasets Loaded',
+          desc: `All datasets have been loaded. Threat data ready for visualisation`,
+          status: 'success',
+          errCode: '',
+          errMsg: '',
+          autoClose: true,
+        })
+      })
     },
   },
 }

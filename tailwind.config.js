@@ -26,6 +26,9 @@ module.exports = {
         'sep-yellow': '#FCDD07', // sep yellow
         'sep-red': '#da1219', // sep red
         'sep-gray': '#303030', // gray 3
+        'brand-yellow': '#FCDD07', // ed yellow
+        'brand-red': '#da1219', // ed red
+        'brand-gray': '#303030', // gray 3
         'app-gray-100': '#EFEFEF', // gray-5
         'app-gray-150': '#dddddd', // ed-gray-5-compliment
         'app-gray-250': '#00000029', // gray 1 #00000029

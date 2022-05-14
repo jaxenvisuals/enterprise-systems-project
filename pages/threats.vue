@@ -5,7 +5,11 @@
     <div v-if="computedThreats" class="">
       <CollapsibleChart />
 
-      <CustomTable :table-data="computedThreats.tableData" sortable />
+      <CustomTable
+        :table-data="computedThreats.tableData"
+        :options="{ serial: true }"
+        sortable
+      />
     </div>
   </div>
 </template>

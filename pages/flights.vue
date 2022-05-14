@@ -3,7 +3,11 @@
     <p class="text-lg font-bold">Incoming Flights</p>
 
     <div v-if="stateDataSet" class="mt-4">
-      <CustomTable :table-data="stateDataSet.tableData" :options="options" />
+      <CustomTable
+        :table-data="stateDataSet.tableData"
+        :options="options"
+        sortable
+      />
     </div>
   </div>
 </template>
@@ -15,6 +19,7 @@ export default {
   computed: {
     options() {
       return {
+        serial: true,
         clickable: true,
         events: {
           handleRowClick: this.handleClick,

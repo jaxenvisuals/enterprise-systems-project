@@ -117,7 +117,15 @@ export default {
   methods: {
     showFileUploader() {
       if (!this.set) {
-        return alert('Select a dataset type you wish to upload')
+        this.$store.commit('pushToast', {
+          title: 'Dataset required',
+          desc: `Select a dataset type you wish to upload`,
+          status: 'error',
+          errCode: '',
+          errMsg: '',
+          autoClose: true,
+        })
+        return
       }
       this.$refs[this.id].click()
     },
@@ -127,13 +135,27 @@ export default {
       const file = e?.target?.files[0]
       if (!file) {
         this.clearTable()
-        return alert('Select a file')
+        this.$store.commit('pushToast', {
+          title: 'File required',
+          desc: `You must select a file`,
+          status: 'error',
+          errCode: '',
+          errMsg: '',
+          autoClose: true,
+        })
+        return
       }
       const extension = fileTypeChecker(file.name)
       if (!extension) {
-        return alert(
-          'Invalid file. You can only upload files in either a JSON, XML, Microsoft Access DB or excel format'
-        )
+        this.$store.commit('pushToast', {
+          title: 'Invalid file uploaded',
+          desc: `Invalid file. You can only upload files in either a JSON, XML, Microsoft Access DB or excel format`,
+          status: 'error',
+          errCode: '',
+          errMsg: '',
+          autoClose: true,
+        })
+        return
       }
 
       this.file.name = file.name
@@ -156,7 +178,14 @@ export default {
         }
 
         default:
-          alert('Not sure of the content of this file')
+          this.$store.commit('pushToast', {
+            title: "Can't understand file",
+            desc: `We are not sure of the content of your upload`,
+            status: 'error',
+            errCode: '',
+            errMsg: '',
+            autoClose: true,
+          })
           break
       }
     },
@@ -169,7 +198,14 @@ export default {
         })
         .catch((err) => {
           this.clearTable(err)
-          alert(err)
+          this.$store.commit('pushToast', {
+            title: 'Error',
+            desc: err,
+            status: 'error',
+            errCode: '',
+            errMsg: '',
+            autoClose: true,
+          })
         })
     },
 
@@ -181,7 +217,14 @@ export default {
         })
         .catch((err) => {
           this.clearTable(err)
-          alert(err)
+          this.$store.commit('pushToast', {
+            title: 'Error',
+            desc: err,
+            status: 'error',
+            errCode: '',
+            errMsg: '',
+            autoClose: true,
+          })
         })
     },
 
@@ -193,7 +236,14 @@ export default {
         })
         .catch((err) => {
           this.clearTable(err)
-          alert(err)
+          this.$store.commit('pushToast', {
+            title: 'Error',
+            desc: err,
+            status: 'error',
+            errCode: '',
+            errMsg: '',
+            autoClose: true,
+          })
         })
     },
 
@@ -241,7 +291,14 @@ export default {
             this.confirmSave(payload)
           })
           .catch((err) => {
-            alert(err)
+            this.$store.commit('pushToast', {
+              title: 'Error',
+              desc: err,
+              status: 'error',
+              errCode: '',
+              errMsg: '',
+              autoClose: true,
+            })
           })
       } catch (err) {}
     },
@@ -263,6 +320,14 @@ export default {
         data: payload,
       })
         .then(({ data }) => {
+          this.$store.commit('pushToast', {
+            title: 'Data uploaded',
+            desc: `We have added your data to your datasets`,
+            status: 'success',
+            errCode: '',
+            errMsg: '',
+            autoClose: true,
+          })
           refineApiData({ data: data.data })
             .then((data) => {
               this.$store.commit('setDataSets', {
@@ -274,12 +339,25 @@ export default {
               })
             })
             .catch((err) => {
-              alert('There was an issue after saving your data')
-              console.log(err)
+              this.$store.commit('pushToast', {
+                title: 'Error',
+                desc: `There was an issue after saving your data`,
+                status: 'error',
+                errCode: '',
+                errMsg: err,
+                autoClose: true,
+              })
             })
         })
         .catch((err) => {
-          alert('Could not save your data to our database')
+          this.$store.commit('pushToast', {
+            title: 'Error',
+            desc: `Could not save your data to our database`,
+            status: 'error',
+            errCode: '',
+            errMsg: '',
+            autoClose: true,
+          })
           console.log(err)
         })
     },
