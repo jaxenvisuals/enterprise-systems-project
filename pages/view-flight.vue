@@ -1,8 +1,42 @@
 <template>
   <div v-if="flight" class="px-4 py-6 text-black">
-    <p class="text-lg font-bold">
-      Flight {{ flight.flightNum.raw || 'Invalid Flight Number' }}
-    </p>
+    <div class="flex items-center justify-between">
+      <p class="text-lg font-bold">
+        Flight {{ flight.flightNum.raw || 'Invalid Flight Number' }}
+      </p>
+
+      <div class="flex items-center gap-1">
+        <p class="text-xs leading-snug tracking-tight">
+          {{ active.index + 1 + ' of ' + evaluatedFlights.length }}
+        </p>
+        <button
+          class="flex items-center justify-center p-1 rounded-none  focus:outline-none"
+          :disabled="active.index === 0"
+          :class="[
+            {
+              'opacity-50': active.index === 0,
+              'hover:opacity-70': active.index !== 0,
+            },
+          ]"
+          @click="prev"
+        >
+          <MaterialIcon icon="chevron_left" />
+        </button>
+        <button
+          class="flex items-center justify-center p-1 rounded-none  focus:outline-none"
+          :disabled="!(active.index < evaluatedFlights.length - 1)"
+          :class="[
+            {
+              'opacity-50': !(active.index < evaluatedFlights.length - 1),
+              'hover:opacity-70': active.index < evaluatedFlights.length - 1,
+            },
+          ]"
+          @click="next()"
+        >
+          <MaterialIcon icon="chevron_right" />
+        </button>
+      </div>
+    </div>
 
     <div class="mt-3">
       <div class="grid grid-cols-4 border divide-x shadow">
@@ -88,6 +122,10 @@ export default {
   },
 
   computed: {
+    active() {
+      return this?.$store?.state?.activeFlight
+    },
+
     flight() {
       return this?.$store?.state?.activeFlight?.selected
     },
@@ -185,6 +223,32 @@ export default {
       compThreats.body = flightThreatsBody
       // filter all matching passport numbers and return from comp threats
       return compThreats
+    },
+
+    evaluatedFlights() {
+      return this.$store.getters.evaluatedFlights
+    },
+  },
+
+  methods: {
+    next() {
+      const currentIdx = this.active.index
+      if (!(currentIdx < this.evaluatedFlights.length - 1)) return
+
+      this.$store.commit('setActiveFlightView', {
+        selected: this.evaluatedFlights[currentIdx + 1],
+        index: currentIdx + 1,
+      })
+    },
+
+    prev() {
+      const currentIdx = this.active.index
+      if (currentIdx === 0) return
+
+      this.$store.commit('setActiveFlightView', {
+        selected: this.evaluatedFlights[currentIdx - 1],
+        index: currentIdx - 1,
+      })
     },
   },
 }

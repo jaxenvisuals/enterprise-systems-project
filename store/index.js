@@ -149,6 +149,83 @@ export const getters = {
       return filterRow(state, args)
     }
   },
+
+  evaluatedFlights(state, getters) {
+    let table = getters.dataSets.flights.tableData
+    if (!table?.body?.length) {
+      return null
+    }
+
+    table = JSON.parse(JSON.stringify(table))
+
+    const aircraftIdx = table.header.findIndex((h) => h.label === 'Aircraft')
+    const deptIdx = table.header.findIndex((h) => h.label === 'Departure')
+    const arrIdx = table.header.findIndex((h) => h.label === 'Arrival')
+    const termIdx = table.header.findIndex((h) => h.label === 'Terminal')
+    const flightIdx = table.header.findIndex((h) => h.label === 'Flight Number')
+
+    if (
+      !(
+        greaterThanZero(aircraftIdx) &&
+        greaterThanZero(deptIdx) &&
+        greaterThanZero(arrIdx) &&
+        greaterThanZero(termIdx) &&
+        greaterThanZero(flightIdx)
+      )
+    )
+      return null
+
+    const evaluatedData = []
+
+    table.body.forEach((row) => {
+      const newData = {
+        aircraft: {
+          raw: row.values[aircraftIdx].label,
+          details: getters.getRow({
+            id: row.values[aircraftIdx].label,
+            data: 'aircrafts',
+            key: 'Aircraft Number',
+          }),
+        },
+        dept: {
+          raw: row.values[deptIdx].label,
+          details: getters.getRow({
+            id: row.values[deptIdx].label,
+            data: 'airports',
+            key: 'IATA Code',
+          }),
+        },
+        arr: {
+          raw: row.values[arrIdx].label,
+          details: getters.getRow({
+            id: row.values[arrIdx].label,
+            data: 'airports',
+            key: 'IATA Code',
+          }),
+        },
+        term: {
+          raw: row.values[termIdx].label,
+        },
+        flightNum: {
+          raw: row.values[flightIdx].label,
+          details: getters.filterRow({
+            id: row.values[flightIdx].label,
+            data: 'passengers',
+            key: 'Flight Number',
+          }),
+          airline: getters.getRow({
+            id: row.values[flightIdx].label[0] + row.values[flightIdx].label[1],
+            data: 'airlines',
+            key: '2 Letter Code',
+          }),
+        },
+      }
+
+      evaluatedData.push(newData)
+    })
+
+    return evaluatedData
+  },
 }
 
 export const mutations = {
@@ -232,4 +309,8 @@ function filterRow(state, { id, data, key }) {
   if (!filtered) return false
 
   return filtered
+}
+
+function greaterThanZero(n) {
+  return n >= 0
 }

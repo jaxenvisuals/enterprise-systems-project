@@ -124,12 +124,42 @@ export default {
         },
       ],
       computedThreatsData: null,
+      charts: {
+        ter: null,
+        smu: null,
+        nar: null,
+        ill: null,
+        lev: null,
+      },
     }
   },
 
   computed: {
     computedThreats() {
       return this.$store.getters.computedThreats || null
+    },
+  },
+
+  watch: {
+    data: {
+      deep: true,
+      handler(v) {
+        this.computedThreatsData = v
+
+        if (!this.computedThreatsData) return
+
+        if (this.visualizeData) {
+          setTimeout(() => {
+            initThreatCategory(this, true)
+          }, 10)
+        }
+
+        if (this.threatLevelVisible) {
+          setTimeout(() => {
+            initThreatLevel(this, true)
+          }, 30)
+        }
+      },
     },
   },
 
@@ -150,12 +180,12 @@ export default {
   methods: {
     initThreatLevel() {
       const here = this
-      initThreatLevel(here)
+      initThreatLevel(here, Boolean(this.charts.lev))
     },
 
     initThreatCategory() {
       const here = this
-      initThreatCategory(here)
+      initThreatCategory(here, Boolean(this.charts.ter))
     },
 
     toggleDataVisualization() {
@@ -168,6 +198,10 @@ export default {
         }, 10)
       } else {
         this.threatLevelVisible = false
+        this.charts.ter = null
+        this.charts.smu = null
+        this.charts.nar = null
+        this.charts.ill = null
       }
     },
 
@@ -178,6 +212,8 @@ export default {
           setTimeout(() => {
             this.initThreatLevel()
           }, 30)
+        } else {
+          this.charts.lev = null
         }
       }
     },

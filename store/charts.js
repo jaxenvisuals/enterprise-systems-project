@@ -1,6 +1,6 @@
 import * as echarts from 'echarts'
 
-export function initThreatCategory(here) {
+export function initThreatCategory(here, update) {
   const data = here.computedThreatsData.tableData
   const threatNames = [
     'Terrorism (50%)',
@@ -85,107 +85,127 @@ export function initThreatCategory(here) {
     },
   ]
 
-  const threatCategory = (i) =>
-    echarts.init(here.$refs['e-pie-threat-category-' + i], null, {
-      width: 150,
-      height: 190,
-    })
-
-  const option = {
-    series: [
-      {
-        type: 'gauge',
-        radius: '80%',
-        axisLine: {
-          lineStyle: {
-            width: 8,
-            color: [
-              [0.1, '#67e0e3'],
-              [0.4, '#37a2da'],
-              [1, '#fd666c'],
+  if (update) {
+    ;['ter', 'smu', 'nar', 'ill'].forEach((k, i) => {
+      here.charts[k].setOption({
+        series: [
+          {
+            data: [
+              {
+                value: threatCategoryData[i].value,
+              },
             ],
           },
-        },
-        pointer: {
-          itemStyle: {
-            color: 'auto',
-          },
-          width: 3,
-        },
-        axisTick: {
-          distance: -3,
-          length: 4,
-          lineStyle: {
-            color: '#fff',
-            width: 1,
-          },
-        },
-        splitLine: {
-          distance: -6,
-          length: 10,
-          lineStyle: {
-            color: '#fff',
-            width: 2,
-          },
-        },
-        axisLabel: {
-          color: 'auto',
-          distance: 9,
-          fontSize: 7,
-        },
-        detail: {
-          valueAnimation: true,
-          formatter: '{value}%',
-          color: 'auto',
-          fontSize: 10,
-        },
-        data: [
-          {
-            value: 50,
-          },
         ],
-      },
-    ],
+      })
+    })
+  } else {
+    const threatCategory = (i) =>
+      echarts.init(here.$refs['e-pie-threat-category-' + i], null, {
+        width: 150,
+        height: 190,
+      })
+
+    const option = {
+      series: [
+        {
+          type: 'gauge',
+          radius: '80%',
+          axisLine: {
+            lineStyle: {
+              width: 8,
+              color: [
+                [0.1, '#67e0e3'],
+                [0.4, '#37a2da'],
+                [1, '#fd666c'],
+              ],
+            },
+          },
+          pointer: {
+            itemStyle: {
+              color: 'auto',
+            },
+            width: 3,
+          },
+          axisTick: {
+            distance: -3,
+            length: 4,
+            lineStyle: {
+              color: '#fff',
+              width: 1,
+            },
+          },
+          splitLine: {
+            distance: -6,
+            length: 10,
+            lineStyle: {
+              color: '#fff',
+              width: 2,
+            },
+          },
+          axisLabel: {
+            color: 'auto',
+            distance: 9,
+            fontSize: 7,
+          },
+          detail: {
+            valueAnimation: true,
+            formatter: '{value}%',
+            color: 'auto',
+            fontSize: 10,
+          },
+          data: [
+            {
+              value: 50,
+            },
+          ],
+        },
+      ],
+    }
+
+    const option1 = JSON.parse(JSON.stringify(option))
+    option1.series[0].axisLine.lineStyle.color = [
+      [0.05, '#67e0e3'],
+      [0.35, '#37a2da'],
+      [1, '#fd666c'],
+    ]
+    option1.series[0].data[0].value = threatCategoryData[0].value
+    option1 && threatCategory('1').setOption(option1)
+    here.charts.ter = threatCategory('1')
+
+    const option2 = JSON.parse(JSON.stringify(option))
+    option2.series[0].axisLine.lineStyle.color = [
+      [0.2, '#67e0e3'],
+      [0.55, '#37a2da'],
+      [1, '#fd666c'],
+    ]
+    option2.series[0].data[0].value = threatCategoryData[1].value
+    option2 && threatCategory('2').setOption(option2)
+    here.charts.smu = threatCategory('2')
+
+    const option3 = JSON.parse(JSON.stringify(option))
+    option3.series[0].axisLine.lineStyle.color = [
+      [0.33, '#67e0e3'],
+      [0.8, '#37a2da'],
+      [1, '#fd666c'],
+    ]
+    option3.series[0].data[0].value = threatCategoryData[2].value
+    option3 && threatCategory('3').setOption(option3)
+    here.charts.nar = threatCategory('3')
+
+    const option4 = JSON.parse(JSON.stringify(option))
+    option4.series[0].axisLine.lineStyle.color = [
+      [0.33, '#67e0e3'],
+      [0.66, '#37a2da'],
+      [1, '#fd666c'],
+    ]
+    option4.series[0].data[0].value = threatCategoryData[3].value
+    option4 && threatCategory('4').setOption(option4)
+    here.charts.ill = threatCategory('4')
   }
-
-  const option1 = JSON.parse(JSON.stringify(option))
-  option1.series[0].axisLine.lineStyle.color = [
-    [0.05, '#67e0e3'],
-    [0.35, '#37a2da'],
-    [1, '#fd666c'],
-  ]
-  option1.series[0].data[0].value = threatCategoryData[0].value
-  option1 && threatCategory('1').setOption(option1)
-
-  const option2 = JSON.parse(JSON.stringify(option))
-  option2.series[0].axisLine.lineStyle.color = [
-    [0.2, '#67e0e3'],
-    [0.55, '#37a2da'],
-    [1, '#fd666c'],
-  ]
-  option2.series[0].data[0].value = threatCategoryData[1].value
-  option2 && threatCategory('2').setOption(option2)
-
-  const option3 = JSON.parse(JSON.stringify(option))
-  option3.series[0].axisLine.lineStyle.color = [
-    [0.33, '#67e0e3'],
-    [0.8, '#37a2da'],
-    [1, '#fd666c'],
-  ]
-  option3.series[0].data[0].value = threatCategoryData[2].value
-  option3 && threatCategory('3').setOption(option3)
-
-  const option4 = JSON.parse(JSON.stringify(option))
-  option4.series[0].axisLine.lineStyle.color = [
-    [0.33, '#67e0e3'],
-    [0.66, '#37a2da'],
-    [1, '#fd666c'],
-  ]
-  option4.series[0].data[0].value = threatCategoryData[3].value
-  option4 && threatCategory('4').setOption(option4)
 }
 
-export function initThreatLevel(here) {
+export function initThreatLevel(here, update) {
   const chartData = [
     {
       value: 0,
@@ -215,46 +235,62 @@ export function initThreatLevel(here) {
     }
   })
 
-  const myChart = echarts.init(here.$refs['e-pie-threat-level'], null, {
-    width: 450,
-    height: 200,
-  })
+  if (update) {
+    here.charts.lev.setOption({
+      series: [
+        {
+          data: chartData.map((c) => {
+            return {
+              name: c.name + ': ' + c.value,
+              value: c.value,
+            }
+          }),
+        },
+      ],
+    })
+  } else {
+    const myChart = echarts.init(here.$refs['e-pie-threat-level'], null, {
+      width: 450,
+      height: 200,
+    })
 
-  const option = {
-    color: ['#fd666c', '#37a2da', '#67e0e3'],
-    legend: {
-      top: 'bottom',
-    },
-    toolbox: {
-      show: true,
-      feature: {
-        mark: { show: true },
-        dataView: { show: false, readOnly: false },
-        restore: { show: false },
-        saveAsImage: { show: false },
+    const option = {
+      color: ['#fd666c', '#37a2da', '#67e0e3'],
+      legend: {
+        top: 'bottom',
       },
-    },
-    series: [
-      {
-        name: 'Threat Data',
-        type: 'pie',
-        radius: '30%',
-        data: chartData.map((c) => {
-          return {
-            name: c.name + ': ' + c.value,
-            value: c.value,
-          }
-        }),
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.5)',
-          },
+      toolbox: {
+        show: true,
+        feature: {
+          mark: { show: true },
+          dataView: { show: false, readOnly: false },
+          restore: { show: false },
+          saveAsImage: { show: false },
         },
       },
-    ],
-  }
+      series: [
+        {
+          name: 'Threat Data',
+          type: 'pie',
+          radius: '30%',
+          data: chartData.map((c) => {
+            return {
+              name: c.name + ': ' + c.value,
+              value: c.value,
+            }
+          }),
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+        },
+      ],
+    }
 
-  option && myChart.setOption(option)
+    option && myChart.setOption(option)
+    here.charts.lev = myChart
+  }
 }
